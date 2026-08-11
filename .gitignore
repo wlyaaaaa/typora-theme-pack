@@ -1,0 +1,11 @@
+__pycache__/
+*.py[cod]
+qa/
+.venv/
+venv/
+node_modules/
+.pytest_cache/
+.mypy_cache/
+.DS_Store
+Thumbs.db
+Mint-Typora-Theme.zip

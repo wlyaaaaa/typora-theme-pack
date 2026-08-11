@@ -1,0 +1,86 @@
+@import url("./verdant/base.css");
+
+/* 薄荷 Mint Emerald — the only installed Typora theme */
+:root {
+  --paper: #fcfffd;
+  --canvas: #d9ede1;
+  --surface: #eff9f3;
+  --surface-strong: #d5eddf;
+  --ink: #0d3323;
+  --ink-soft: #446758;
+  --muted: #6f8e7d;
+  --brand: #07854b;
+  --brand-deep: #06472f;
+  --brand-soft: #cce8d7;
+  --accent: #23a261;
+  --accent-2: #86b697;
+  --line: #c4dfce;
+  --code-bg: #eaf5ee;
+  --quote-bg: #e8f5ed;
+  --table-head: #cfe9d9;
+  --sidebar-bg: #cfe8d9;
+  --sidebar-ink: #164a31;
+  --titlebar-bg: #075b3b;
+  --titlebar-ink: #f6fff9;
+  --shadow: 0 24px 68px rgba(4, 75, 43, .15);
+  --radius: 20px;
+  --small-radius: 12px;
+}
+
+content {
+  background:
+    radial-gradient(circle at 12% 8%, rgba(255,255,255,.88), transparent 26%),
+    radial-gradient(circle at 92% 18%, rgba(37,162,97,.16), transparent 31%),
+    var(--canvas) !important;
+}
+
+#write {
+  border: 1px solid rgba(255,255,255,.94);
+}
+
+#write h1 {
+  color: var(--brand-deep);
+}
+
+#write h1::after {
+  width: 142px;
+  height: 7px;
+  background: linear-gradient(90deg, #07854b, #2aaa6b 68%, #92bfa1);
+}
+
+#write h2 {
+  padding: .52em .86em;
+  border: 0;
+  border-radius: 14px;
+  background: linear-gradient(110deg, #d4efdf, #f1faf5 78%);
+  box-shadow: inset 0 0 0 1px #c3e2d0;
+}
+
+#write h3::before {
+  border: 0;
+  background: var(--brand);
+  box-shadow: 0 0 0 4px #dcf1e4;
+}
+
+#write blockquote {
+  border-left: 0;
+  border-radius: 14px;
+  background: linear-gradient(120deg, #e4f4ea, #f8fcfa 76%);
+  box-shadow: inset 5px 0 0 var(--brand);
+}
+
+#write table {
+  border-radius: 13px;
+}
+
+#typora-sidebar {
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.34), transparent 34%),
+    var(--sidebar-bg) !important;
+}
+
+@media print {
+  #write h1::after {
+    background: linear-gradient(90deg, #07854b, #2aaa6b, #92bfa1);
+  }
+}

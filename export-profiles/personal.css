@@ -1,0 +1,45 @@
+/* 自己阅读：在薄荷主题基础上增大字号与留白。 */
+:root {
+  --paper: #fbfffc;
+  --canvas: #d8eee1;
+  --surface: #effaf4;
+  --surface-strong: #d8f0e2;
+  --ink: #123426;
+  --ink-soft: #496b5a;
+  --brand: #078d50;
+  --brand-deep: #06472f;
+  --brand-soft: #c9ead7;
+  --accent: #29a969;
+  --accent-2: #8ab99a;
+  --line: #c4e1cf;
+  --radius: 22px;
+  --small-radius: 14px;
+}
+
+#write,
+body {
+  font-size: 18px;
+  line-height: 2;
+}
+
+#write h2,
+body > h2 {
+  padding: .58em .9em;
+  border-radius: 15px;
+  background: linear-gradient(110deg, #d2efde, #f1faf5 80%);
+}
+
+#write blockquote,
+body > blockquote {
+  padding-top: 1.2em;
+  padding-bottom: 1.2em;
+  border-radius: 15px;
+}
+
+@media print {
+  #write,
+  body {
+    font-size: 11.2pt;
+    line-height: 1.84;
+  }
+}

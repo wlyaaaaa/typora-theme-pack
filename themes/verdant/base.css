@@ -1,0 +1,633 @@
+/*
+ * Verdant Theme System for Typora
+ * Shared structure for four production-ready light themes.
+ */
+
+:root {
+  --font-body: "HarmonyOS Sans SC", "Noto Sans SC", "Microsoft YaHei UI", sans-serif;
+  --font-display: "HarmonyOS Sans SC", "Noto Sans SC", "Microsoft YaHei UI", sans-serif;
+  --font-serif: "Noto Serif SC", "STSong", "SimSun", serif;
+  --font-mono: "Cascadia Code", "JetBrains Mono", Consolas, monospace;
+
+  --paper: #fcfffd;
+  --canvas: #e4eee8;
+  --surface: #f2f8f4;
+  --surface-strong: #dcece2;
+  --ink: #0d3022;
+  --ink-soft: #456356;
+  --muted: #6f8a7d;
+  --brand: #007a45;
+  --brand-deep: #003f29;
+  --brand-soft: #d4eadc;
+  --accent: #24945e;
+  --accent-2: #79a98a;
+  --line: #c9ddd1;
+  --code-bg: #edf5f0;
+  --quote-bg: #edf7f1;
+  --table-head: #d9ebe0;
+  --sidebar-bg: #e0eee6;
+  --sidebar-ink: #123f2c;
+  --titlebar-bg: #043f2b;
+  --titlebar-ink: #f6fffb;
+  --shadow: 0 18px 60px rgba(22, 72, 52, 0.10);
+  --radius: 14px;
+  --small-radius: 8px;
+
+  --bg-color: var(--paper);
+  --text-color: var(--ink);
+  --md-char-color: var(--muted);
+  --meta-content-color: var(--muted);
+  --primary-color: var(--brand);
+  --primary-btn-border-color: var(--brand-deep);
+  --primary-btn-text-color: #ffffff;
+  --side-bar-bg-color: var(--sidebar-bg);
+  --control-text-color: var(--ink-soft);
+  --control-text-hover-color: var(--ink);
+  --window-border: 1px solid var(--line);
+  --window-border-color: var(--line);
+  --active-file-bg-color: var(--brand-soft);
+  --active-file-text-color: var(--brand-deep);
+  --item-hover-bg-color: var(--surface-strong);
+  --item-hover-text-color: var(--brand-deep);
+  --select-text-bg-color: rgba(67, 168, 124, 0.22);
+  --search-select-bg-color: #ffe59b;
+  --rawblock-edit-panel-bd: var(--code-bg);
+  --monospace: var(--font-mono);
+}
+
+html,
+body {
+  background: var(--canvas) !important;
+  color: var(--ink);
+}
+
+body,
+button,
+input,
+textarea,
+select,
+.dropdown-menu,
+.context-menu {
+  font-family: var(--font-body);
+}
+
+content {
+  background:
+    radial-gradient(circle at 20% 5%, rgba(255,255,255,.92), transparent 34%),
+    var(--canvas) !important;
+}
+
+#write {
+  box-sizing: border-box;
+  width: calc(100% - 72px);
+  max-width: 980px;
+  min-height: calc(100vh - 72px);
+  margin: 36px auto 90px;
+  padding: 68px 86px 110px;
+  border: 1px solid color-mix(in srgb, var(--line) 84%, transparent);
+  border-radius: var(--radius);
+  background: var(--paper);
+  box-shadow: var(--shadow);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 17px;
+  font-weight: 400;
+  line-height: 1.88;
+  letter-spacing: .012em;
+}
+
+#write > :first-child {
+  margin-top: 0 !important;
+}
+
+#write > :last-child {
+  margin-bottom: 0 !important;
+}
+
+#write p,
+#write li {
+  color: var(--ink);
+}
+
+#write p {
+  margin: .78em 0;
+}
+
+#write h1,
+#write h2,
+#write h3,
+#write h4,
+#write h5,
+#write h6 {
+  position: relative;
+  color: var(--brand-deep);
+  font-family: var(--font-display);
+  font-weight: 700;
+  line-height: 1.38;
+  letter-spacing: -.018em;
+}
+
+#write h1 {
+  margin: 0 0 .7em;
+  padding: 0 0 .48em;
+  border-bottom: 0;
+  font-size: 2.38em;
+  font-weight: 760;
+}
+
+#write h1::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 92px;
+  height: 5px;
+  border-radius: 99px;
+  background: linear-gradient(90deg, var(--brand), var(--accent), var(--accent-2));
+}
+
+#write > h1:first-child + p {
+  margin: -0.25em 0 2.2em;
+  color: var(--ink-soft);
+  font-size: 1.03em;
+  letter-spacing: .04em;
+}
+
+#write h2 {
+  margin: 2.15em 0 .9em;
+  padding: .46em .72em .5em .86em;
+  border-left: 5px solid var(--brand);
+  border-radius: 0 var(--small-radius) var(--small-radius) 0;
+  background: linear-gradient(90deg, var(--surface-strong), color-mix(in srgb, var(--surface) 45%, transparent));
+  font-size: 1.52em;
+}
+
+#write h3 {
+  margin: 1.75em 0 .72em;
+  padding-bottom: .36em;
+  border-bottom: 1px solid var(--line);
+  font-size: 1.22em;
+}
+
+#write h3::before {
+  content: "";
+  display: inline-block;
+  width: .55em;
+  height: .55em;
+  margin-right: .55em;
+  border: 2px solid var(--brand);
+  border-radius: 50%;
+  background: var(--paper);
+  vertical-align: .04em;
+}
+
+#write h4 {
+  margin: 1.45em 0 .56em;
+  color: var(--brand);
+  font-size: 1.06em;
+}
+
+#write h5,
+#write h6 {
+  margin: 1.3em 0 .5em;
+  color: var(--ink-soft);
+}
+
+#write strong {
+  color: var(--brand-deep);
+  font-weight: 720;
+}
+
+#write em {
+  color: color-mix(in srgb, var(--brand) 76%, var(--ink));
+}
+
+#write a,
+#write a code {
+  color: var(--brand);
+  text-decoration-color: color-mix(in srgb, var(--brand) 42%, transparent);
+  text-underline-offset: .18em;
+}
+
+#write a:hover {
+  color: var(--brand-deep);
+  text-decoration-color: var(--brand);
+}
+
+#write blockquote {
+  position: relative;
+  margin: 1.35em 0;
+  padding: 1.05em 1.25em 1.05em 1.55em;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-left: 5px solid var(--brand);
+  border-radius: var(--small-radius);
+  background: linear-gradient(135deg, var(--quote-bg), var(--paper));
+  color: var(--ink-soft);
+}
+
+#write blockquote::after {
+  content: "“";
+  position: absolute;
+  right: .18em;
+  top: -.25em;
+  color: color-mix(in srgb, var(--brand) 10%, transparent);
+  font-family: Georgia, serif;
+  font-size: 7em;
+  line-height: 1;
+  pointer-events: none;
+}
+
+#write blockquote p {
+  margin: .2em 0;
+  color: inherit;
+}
+
+#write ul,
+#write ol {
+  margin: .65em 0 .9em;
+  padding-left: 1.65em;
+}
+
+#write li {
+  margin: .28em 0;
+  padding-left: .18em;
+}
+
+#write ul > li::marker {
+  color: var(--brand);
+}
+
+#write ol > li::marker {
+  color: var(--brand);
+  font-weight: 700;
+}
+
+#write .task-list-item input {
+  accent-color: var(--brand);
+}
+
+#write table {
+  width: 100%;
+  margin: 1.35em 0 1.7em;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-collapse: separate;
+  border-spacing: 0;
+  border-radius: var(--small-radius);
+  background: var(--paper);
+  box-shadow: 0 7px 24px rgba(20, 70, 50, .055);
+  font-size: .92em;
+}
+
+#write table thead {
+  background: var(--table-head);
+}
+
+#write table th {
+  color: var(--brand-deep);
+  font-weight: 720;
+  text-align: left;
+  letter-spacing: .02em;
+}
+
+#write table th,
+#write table td {
+  padding: .72em .9em;
+  border: 0;
+  border-right: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+
+#write table th:last-child,
+#write table td:last-child {
+  border-right: 0;
+}
+
+#write table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+#write table tbody tr:nth-child(even) {
+  background: color-mix(in srgb, var(--surface) 72%, var(--paper));
+}
+
+#write table tbody tr:hover {
+  background: var(--surface-strong);
+}
+
+#write code,
+#write tt {
+  margin: 0 .08em;
+  padding: .12em .38em;
+  border: 1px solid color-mix(in srgb, var(--line) 86%, transparent);
+  border-radius: 5px;
+  background: var(--code-bg);
+  color: color-mix(in srgb, var(--brand-deep) 88%, #182020);
+  font-family: var(--font-mono);
+  font-size: .88em;
+}
+
+#write pre,
+#write .md-fences {
+  margin: 1.3em 0;
+  padding: 1.15em 1.3em;
+  overflow: auto;
+  border: 1px solid var(--line);
+  border-radius: var(--small-radius);
+  background:
+    linear-gradient(90deg, var(--brand) 0 4px, transparent 4px),
+    var(--code-bg);
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: .86em;
+  line-height: 1.65;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+#write pre code,
+#write .md-fences code {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: inherit;
+}
+
+/*
+ * Typora 1.14 renders each editable code-fence line as a <pre> inside
+ * CodeMirror. Reset the generic #write pre card treatment here so it is
+ * applied once to .md-fences, not once per source line.
+ */
+#write .md-fences .CodeMirror,
+#write .md-fences .CodeMirror-scroll,
+#write .md-fences .CodeMirror-lines,
+#write .md-fences .CodeMirror-code {
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+#write .md-fences .CodeMirror pre,
+#write .md-fences pre.CodeMirror-line {
+  margin: 0;
+  padding: 0 4px;
+  overflow: visible;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  color: inherit;
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+  white-space: pre;
+  overflow-wrap: normal;
+  word-break: normal;
+}
+
+#write .md-fences .CodeMirror-wrap pre,
+#write .md-fences .CodeMirror-wrap pre.CodeMirror-line {
+  white-space: pre-wrap;
+  word-break: normal;
+}
+
+#write .CodeMirror-gutters {
+  border-right: 1px solid var(--line);
+  background: transparent;
+}
+
+#write hr {
+  height: 1px;
+  margin: 2.5em 0;
+  border: 0;
+  background: linear-gradient(90deg, transparent, var(--accent), var(--brand), var(--accent), transparent);
+}
+
+#write img {
+  max-width: 100%;
+  border-radius: var(--small-radius);
+  box-shadow: 0 12px 34px rgba(15, 60, 45, .12);
+}
+
+#write mark {
+  padding: .06em .24em;
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--accent-2) 28%, #fff8d8);
+  color: var(--ink);
+}
+
+#write kbd {
+  padding: .12em .4em;
+  border: 1px solid var(--line);
+  border-bottom-width: 2px;
+  border-radius: 5px;
+  background: var(--paper);
+  box-shadow: 0 1px 0 var(--line);
+  color: var(--ink-soft);
+  font-family: var(--font-mono);
+  font-size: .82em;
+}
+
+#write .md-toc,
+#write pre.md-meta-block {
+  margin: 1.25em 0;
+  padding: 1.05em 1.2em;
+  border: 1px solid var(--line);
+  border-radius: var(--small-radius);
+  background: var(--surface);
+  color: var(--ink-soft);
+}
+
+#write .footnotes-area {
+  margin-top: 3em;
+  padding-top: 1.2em;
+  border-top: 1px solid var(--line);
+  color: var(--ink-soft);
+  font-size: .88em;
+}
+
+.md-comment,
+.md-meta,
+.md-expand,
+.md-image > .md-meta,
+.md-char,
+.md-entity {
+  color: var(--md-char-color) !important;
+}
+
+::selection {
+  background: var(--select-text-bg-color);
+}
+
+/* Application chrome */
+header,
+#top-titlebar {
+  background: var(--titlebar-bg) !important;
+  color: var(--titlebar-ink) !important;
+}
+
+#top-titlebar .title-text,
+#top-titlebar .toolbar-icon.btn,
+#w-menu-btn,
+#top-titlebar svg {
+  color: var(--titlebar-ink) !important;
+  stroke: currentColor;
+}
+
+#top-titlebar .toolbar-icon.btn:hover,
+#w-menu-btn:hover {
+  background: rgba(255,255,255,.13) !important;
+  color: #ffffff !important;
+}
+
+#typora-sidebar {
+  border-right: 1px solid color-mix(in srgb, var(--line) 88%, transparent);
+  background: var(--sidebar-bg) !important;
+  color: var(--sidebar-ink);
+}
+
+#typora-sidebar .info-panel-tab,
+#typora-sidebar .file-node-content,
+#typora-sidebar .file-list-item,
+#typora-sidebar .sidebar-footer {
+  color: var(--sidebar-ink);
+}
+
+#typora-sidebar .file-node-content:hover,
+#typora-sidebar .file-list-item:hover,
+#typora-sidebar .file-tree-node.active > .file-node-content {
+  border-radius: 6px;
+  background: var(--active-file-bg-color) !important;
+  color: var(--active-file-text-color) !important;
+}
+
+#typora-sidebar .info-panel-tab-border {
+  background: var(--brand) !important;
+}
+
+.sidebar-footer,
+footer.ty-footer {
+  border-color: var(--line) !important;
+  background: color-mix(in srgb, var(--paper) 92%, var(--surface)) !important;
+  color: var(--ink-soft);
+}
+
+.dropdown-menu,
+.context-menu,
+.modal-content,
+.megamenu-content,
+.megamenu-menu,
+.popover,
+#footer-word-count-info {
+  border: 1px solid var(--line) !important;
+  border-radius: 10px !important;
+  background: var(--paper) !important;
+  box-shadow: 0 18px 45px rgba(19, 62, 46, .16) !important;
+  color: var(--ink);
+}
+
+.dropdown-menu > li > a:hover,
+.dropdown-menu > .active > a,
+.context-menu > li > a:hover,
+.megamenu-menu-list li a:hover,
+.megamenu-menu-list li a.active {
+  background: var(--surface-strong) !important;
+  color: var(--brand-deep) !important;
+}
+
+input,
+textarea,
+select,
+.form-control {
+  border-color: var(--line) !important;
+  border-radius: 7px !important;
+  background: var(--surface) !important;
+  color: var(--ink) !important;
+}
+
+.btn-primary {
+  border-color: var(--brand-deep) !important;
+  border-radius: 7px !important;
+  background: var(--brand) !important;
+  color: white !important;
+}
+
+::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--brand) 42%, transparent);
+  background-clip: padding-box;
+}
+
+@media screen and (max-width: 900px) {
+  #write {
+    width: calc(100% - 32px);
+    margin-top: 16px;
+    padding: 48px 42px 82px;
+  }
+}
+
+@media print {
+  @page {
+    margin: 15mm 14mm 17mm;
+  }
+
+  html,
+  body,
+  content {
+    background: #ffffff !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  #write {
+    width: auto;
+    max-width: none;
+    min-height: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    font-size: 10.7pt;
+    line-height: 1.72;
+  }
+
+  #write h1 {
+    font-size: 25pt;
+  }
+
+  #write h2 {
+    break-after: avoid-page;
+    page-break-after: avoid;
+    font-size: 16pt;
+  }
+
+  #write h3,
+  #write h4,
+  #write table thead {
+    break-after: avoid-page;
+    page-break-after: avoid;
+  }
+
+  #write blockquote,
+  #write pre,
+  #write .md-fences,
+  #write table,
+  #write img {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  #write table {
+    box-shadow: none;
+  }
+
+  #write a {
+    color: var(--brand) !important;
+    text-decoration: none;
+  }
+}

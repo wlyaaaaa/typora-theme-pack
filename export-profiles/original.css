@@ -1,0 +1,189 @@
+/* 原样：中性标准 Markdown 渲染，不套用薄荷或公司样式。 */
+:root {
+  --paper: #ffffff;
+  --canvas: #f3f4f6;
+  --ink: #24292f;
+  --ink-soft: #57606a;
+  --muted: #6e7781;
+  --line: #d8dee4;
+  --surface: #f6f8fa;
+  --surface-strong: #eef1f4;
+  --font-body: "HarmonyOS Sans SC", "Noto Sans SC", "Microsoft YaHei UI", "Segoe UI", sans-serif;
+  --font-mono: "Cascadia Code", Consolas, monospace;
+}
+
+html,
+body {
+  background: var(--canvas) !important;
+  color: var(--ink);
+  font-family: var(--font-body);
+}
+
+#write {
+  box-sizing: border-box;
+  width: calc(100% - 64px);
+  max-width: 920px;
+  min-height: calc(100vh - 64px);
+  margin: 32px auto 72px;
+  padding: 62px 76px 90px;
+  border: 1px solid var(--line);
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.78;
+}
+
+#write h1,
+#write h2,
+#write h3,
+#write h4,
+#write h5,
+#write h6 {
+  color: var(--ink);
+  font-weight: 650;
+  line-height: 1.35;
+}
+
+#write h1 {
+  margin: 0 0 .75em;
+  padding-bottom: .42em;
+  border-bottom: 1px solid var(--line);
+  font-size: 2.15em;
+}
+
+#write > h1:first-child + p {
+  margin: -.2em 0 2em;
+  color: var(--muted);
+}
+
+#write h2 {
+  margin: 2em 0 .75em;
+  padding-bottom: .32em;
+  border-bottom: 1px solid var(--line);
+  font-size: 1.48em;
+}
+
+#write h3 {
+  margin: 1.6em 0 .6em;
+  font-size: 1.2em;
+}
+
+#write h4,
+#write h5,
+#write h6 {
+  margin: 1.35em 0 .5em;
+}
+
+#write p {
+  margin: .72em 0;
+}
+
+#write a {
+  color: #0969da;
+  text-underline-offset: .16em;
+}
+
+#write strong {
+  color: #1f2328;
+  font-weight: 700;
+}
+
+#write blockquote {
+  margin: 1.2em 0;
+  padding: .25em 1em;
+  border-left: 4px solid #d0d7de;
+  background: transparent;
+  color: var(--muted);
+}
+
+#write ul,
+#write ol {
+  padding-left: 1.65em;
+}
+
+#write table {
+  width: 100%;
+  margin: 1.25em 0 1.55em;
+  border-collapse: collapse;
+  background: white;
+  font-size: .92em;
+}
+
+#write table th,
+#write table td {
+  padding: .58em .72em;
+  border: 1px solid var(--line);
+  text-align: left;
+}
+
+#write table th {
+  background: var(--surface-strong);
+  color: var(--ink);
+  font-weight: 650;
+}
+
+#write table tbody tr:nth-child(even) {
+  background: var(--surface);
+}
+
+#write code {
+  padding: .12em .34em;
+  border-radius: 4px;
+  background: var(--surface-strong);
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: .88em;
+}
+
+#write pre,
+#write .md-fences {
+  margin: 1.2em 0;
+  padding: 1em 1.15em;
+  overflow: auto;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: .86em;
+  line-height: 1.62;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+#write pre code,
+#write .md-fences code {
+  padding: 0;
+  background: transparent;
+}
+
+#write hr {
+  height: 1px;
+  margin: 2.2em 0;
+  border: 0;
+  background: var(--line);
+}
+
+@media print {
+  @page { margin: 15mm 14mm 17mm; }
+
+  html,
+  body {
+    background: #ffffff !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  #write {
+    width: auto;
+    max-width: none;
+    min-height: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    font-size: 10.5pt;
+    line-height: 1.68;
+  }
+}

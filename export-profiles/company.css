@@ -1,0 +1,235 @@
+/* 公司内部：石墨黑与深墨蓝的高阶工作文档，不绑定个人配色偏好。 */
+:root {
+  --paper: #ffffff;
+  --canvas: #e9edf0;
+  --surface: #f3f5f7;
+  --surface-strong: #e7ebef;
+  --ink: #18212a;
+  --ink-soft: #4f5d69;
+  --muted: #75818c;
+  --brand: #243b53;
+  --brand-deep: #152a3a;
+  --brand-soft: #e4eaf0;
+  --line: #cbd3da;
+  --font-body: "HarmonyOS Sans SC", "Noto Sans SC", "Microsoft YaHei UI", sans-serif;
+  --font-mono: "Cascadia Code", Consolas, monospace;
+}
+
+html,
+body {
+  background: var(--canvas) !important;
+  color: var(--ink);
+  font-family: var(--font-body);
+}
+
+#write {
+  box-sizing: border-box;
+  width: calc(100% - 64px);
+  max-width: 940px;
+  min-height: calc(100vh - 64px);
+  margin: 32px auto 72px;
+  padding: 64px 80px 96px;
+  border: 1px solid var(--line);
+  background: var(--paper);
+  box-shadow: 0 20px 54px rgba(21, 42, 58, .11);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.76;
+  letter-spacing: .008em;
+}
+
+#write h1,
+#write h2,
+#write h3,
+#write h4,
+#write h5,
+#write h6 {
+  color: var(--brand-deep);
+  font-family: var(--font-body);
+  font-weight: 720;
+  line-height: 1.34;
+}
+
+#write h1 {
+  position: relative;
+  margin: 0 0 .72em;
+  padding: 0 0 .55em;
+  border-bottom: 1px solid var(--brand-deep);
+  font-size: 2.3em;
+  letter-spacing: -.02em;
+}
+
+#write h1::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  width: 96px;
+  height: 3px;
+  background: var(--brand);
+}
+
+#write > h1:first-child + p {
+  margin: -.15em 0 2.15em;
+  color: var(--muted);
+  font-size: .96em;
+  letter-spacing: .035em;
+}
+
+#write h2 {
+  margin: 2.05em 0 .85em;
+  padding: .44em .72em;
+  border-bottom: 0;
+  border-left: 5px solid var(--brand);
+  background: linear-gradient(90deg, var(--brand-soft), #f8fafc 78%);
+  font-size: 1.46em;
+}
+
+#write h3 {
+  margin: 1.65em 0 .68em;
+  padding-bottom: .34em;
+  border-bottom: 1px solid var(--line);
+  font-size: 1.18em;
+}
+
+#write h3::before {
+  content: "";
+  display: inline-block;
+  width: .48em;
+  height: .48em;
+  margin-right: .55em;
+  background: var(--brand);
+  vertical-align: .04em;
+}
+
+#write p {
+  margin: .72em 0;
+}
+
+#write strong {
+  color: var(--brand-deep);
+  font-weight: 720;
+}
+
+#write a {
+  color: var(--brand);
+  text-decoration-color: #96a8b8;
+  text-underline-offset: .18em;
+}
+
+#write blockquote {
+  margin: 1.25em 0;
+  padding: .9em 1.15em;
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--brand);
+  background: #f4f6f8;
+  color: var(--ink-soft);
+}
+
+#write ul,
+#write ol {
+  padding-left: 1.65em;
+}
+
+#write li {
+  margin: .24em 0;
+}
+
+#write li::marker {
+  color: var(--brand);
+}
+
+#write table {
+  width: 100%;
+  margin: 1.3em 0 1.65em;
+  border: 1px solid var(--line);
+  border-collapse: collapse;
+  background: white;
+  box-shadow: 0 6px 18px rgba(21, 42, 58, .06);
+  font-size: .91em;
+}
+
+#write table th,
+#write table td {
+  padding: .62em .78em;
+  border: 1px solid var(--line);
+  text-align: left;
+}
+
+#write table th {
+  background: var(--brand) !important;
+  color: #ffffff !important;
+  font-weight: 700;
+}
+
+#write table tbody tr:nth-child(even) {
+  background: var(--surface);
+}
+
+#write code {
+  padding: .12em .36em;
+  border-radius: 4px;
+  background: #edf1f4;
+  color: var(--brand-deep);
+  font-family: var(--font-mono);
+  font-size: .88em;
+}
+
+#write pre,
+#write .md-fences {
+  margin: 1.25em 0;
+  padding: 1.05em 1.2em;
+  overflow: auto;
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--brand);
+  background: var(--surface);
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: .84em;
+  line-height: 1.62;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+#write pre code,
+#write .md-fences code {
+  padding: 0;
+  background: transparent;
+}
+
+#write hr {
+  height: 1px;
+  margin: 2.3em 0;
+  border: 0;
+  background: linear-gradient(90deg, var(--brand) 0 90px, var(--line) 90px 100%);
+}
+
+@media print {
+  @page { margin: 14mm 14mm 17mm; }
+
+  html,
+  body {
+    background: #ffffff !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  #write {
+    width: auto;
+    max-width: none;
+    min-height: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    box-shadow: none;
+    font-size: 10.3pt;
+    line-height: 1.64;
+  }
+
+  #write table th {
+    background: #243b53 !important;
+    color: #ffffff !important;
+  }
+}
