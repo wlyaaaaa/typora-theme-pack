@@ -1,4 +1,5 @@
 import importlib.util
+import json
 import os
 import re
 import sys
@@ -69,11 +70,62 @@ class ThemeProjectTest(unittest.TestCase):
         self.assertIn("--expected-pages", command)
 
     def test_exporter_requires_an_explicit_external_converter(self):
-        with patch.dict(os.environ, {"MD_PDF_TOOLKIT_CONVERTER": ""}, clear=True):
-            with self.assertRaisesRegex(
-                FileNotFoundError, "No Markdown PDF converter configured"
-            ):
-                self.exporter.resolve_converter()
+        with tempfile.TemporaryDirectory() as temporary:
+            missing_config = Path(temporary) / "missing.json"
+            with patch.dict(os.environ, {"MD_PDF_TOOLKIT_CONVERTER": ""}, clear=True):
+                with self.assertRaisesRegex(
+                    FileNotFoundError, "No Markdown PDF converter configured"
+                ):
+                    self.exporter.resolve_converter(config_path=missing_config)
+
+    def test_exporter_uses_persistent_machine_local_converter(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            converter = root / "converter.py"
+            converter.write_text("# compatible test converter\n", encoding="utf-8")
+            config = root / ".typora-theme-pack.local.json"
+            config.write_text(
+                json.dumps(
+                    {
+                        "schema": self.exporter.LOCAL_CONFIG_SCHEMA,
+                        "converter": str(converter),
+                    }
+                ),
+                encoding="utf-8",
+            )
+
+            with patch.dict(os.environ, {"MD_PDF_TOOLKIT_CONVERTER": ""}, clear=True):
+                self.assertEqual(
+                    self.exporter.resolve_converter(config_path=config),
+                    converter.resolve(),
+                )
+
+    def test_converter_configuration_is_atomic_and_versioned(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            converter = root / "converter.py"
+            converter.write_text("# compatible test converter\n", encoding="utf-8")
+            config = root / ".typora-theme-pack.local.json"
+
+            saved = self.exporter.save_local_converter(str(converter), config)
+            payload = json.loads(config.read_text(encoding="utf-8"))
+
+            self.assertEqual(saved, converter.resolve())
+            self.assertEqual(payload["schema"], self.exporter.LOCAL_CONFIG_SCHEMA)
+            self.assertEqual(Path(payload["converter"]), converter.resolve())
+            self.assertEqual(list(root.glob(f"{config.name}.*.tmp")), [])
+
+    def test_blank_typora_output_placeholder_uses_default_filename(self):
+        source = Path("项目说明.md")
+
+        self.assertEqual(
+            self.exporter.resolve_output_path(source, "personal", ""),
+            Path("项目说明-个人.pdf"),
+        )
+        self.assertEqual(
+            self.exporter.resolve_output_path(source, "company", "   "),
+            Path("项目说明-公司.pdf"),
+        )
 
     def test_public_docs_do_not_contain_machine_specific_paths(self):
         readme = (ROOT / "README.md").read_text(encoding="utf-8")

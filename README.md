@@ -21,8 +21,10 @@ from any specific editor, local toolkit, or machine path.
 
 - Python 3.10 or newer.
 - Typora only for installing/using the editor theme.
-- PDF export additionally requires a compatible external converter. The
-  converter must accept the arguments used by `tools/export_pdf.py`, including
+- PDF export additionally requires a compatible external converter. Configure
+  it per command, through the environment, or in the ignored machine-local
+  project config. The converter must accept the arguments used by
+  `tools/export_pdf.py`, including
   `--input`, `--output`, `--css-file`, `--document-style-policy`,
   `--require-style`, and optional `--expected-pages`.
 - Preview rendering is optional and may require Microsoft Edge, Node.js, and
@@ -48,37 +50,44 @@ Themes menu.
 
 ## Export Markdown to PDF
 
-Set or pass the converter explicitly; no local/private converter path is
-assumed:
+Persist the converter once for editor-launched exports; the generated config
+is machine-local and ignored by Git, so no local/private path is published:
 
 ```powershell
-$env:MD_PDF_TOOLKIT_CONVERTER = '<path-to-compatible-converter.py>'
+python tools/configure_converter.py --converter <path-to-compatible-converter.py>
+```
+
+Then export normally:
+
+```powershell
 python tools/export_pdf.py --input <Markdown路径> --mode original
 python tools/export_pdf.py --input <Markdown路径> --mode personal
 python tools/export_pdf.py --input <Markdown路径> --mode company
 ```
 
-You can also pass `--converter <path>` on each invocation. Use
-`--output <PDF路径>` to choose an explicit output, or omit it to create a
-source-adjacent file with one of these suffixes:
+Resolution order is `--converter <path>`, `MD_PDF_TOOLKIT_CONVERTER`, then the
+machine-local config. Use `--output <PDF路径>` to choose an explicit output, or
+omit it to create a source-adjacent file with one of these suffixes:
 
 - `文档名-原版.pdf`
 - `文档名-个人.pdf`
 - `文档名-公司.pdf`
 
 The exporter uses an external CSS file, defaults to ignoring inline Markdown
-styles, and verifies that the source Markdown SHA-256 is unchanged.
+styles, and verifies that the source Markdown SHA-256 is unchanged. Existing
+Typora commands that expand an unused output placeholder to `--output ""` are
+also treated as if `--output` were omitted.
 
 ### Typora custom commands
 
-In `Preferences → Export`, add three Custom Commands. Replace the two
-placeholders with paths on your machine and set the command to require no
-output path:
+In `Preferences → Export`, add three Custom Commands. After configuring the
+converter once, replace `<PROJECT_ROOT>` with the checkout path and set each
+command to require no output path:
 
 ```text
-python "<PROJECT_ROOT>\tools\export_pdf.py" --converter "<CONVERTER>" --input "${currentPath}" --mode original
-python "<PROJECT_ROOT>\tools\export_pdf.py" --converter "<CONVERTER>" --input "${currentPath}" --mode personal
-python "<PROJECT_ROOT>\tools\export_pdf.py" --converter "<CONVERTER>" --input "${currentPath}" --mode company
+python "<PROJECT_ROOT>\tools\export_pdf.py" --input "${currentPath}" --mode original
+python "<PROJECT_ROOT>\tools\export_pdf.py" --input "${currentPath}" --mode personal
+python "<PROJECT_ROOT>\tools\export_pdf.py" --input "${currentPath}" --mode company
 ```
 
 ## Verify
