@@ -16,6 +16,9 @@ import subprocess
 import sys
 import tempfile
 
+from pypdf import PdfReader
+from pypdf.errors import PdfReadError
+
 from render_previews import profile_css
 
 
@@ -28,10 +31,16 @@ MODE_LABELS = {
     "company": "公司",
     "personal": "个人",
 }
+STAGED_OUTPUT_PREFIX = ".typora-export-"
+STAGED_OUTPUT_SUFFIX = ".staged.pdf"
 
 
 class ConverterConfigurationError(ValueError):
     """Raised when the persistent machine-local converter config is invalid."""
+
+
+class PdfOutputValidationError(ValueError):
+    """Raised when a converter does not produce a credible staged PDF."""
 
 
 def sha256_file(path: Path) -> str:
@@ -150,6 +159,41 @@ def resolve_output_path(source: Path, mode: str, explicit: str | None) -> Path:
     return Path(raw).expanduser().resolve() if raw else default_output_path(source, mode)
 
 
+def remove_temporary_best_effort(path: Path | None) -> None:
+    """Remove one temporary artifact without masking the export result."""
+    if path is None:
+        return
+    try:
+        path.unlink(missing_ok=True)
+    except OSError as error:
+        print(f"Warning: cannot remove temporary file {path}: {error}", file=sys.stderr)
+
+
+def reserve_staged_output_path(output: Path) -> Path:
+    """Return a unique, currently absent PDF path beside the final output."""
+    with tempfile.NamedTemporaryFile(
+        prefix=STAGED_OUTPUT_PREFIX,
+        suffix=STAGED_OUTPUT_SUFFIX,
+        dir=output.parent,
+    ) as stream:
+        return Path(stream.name)
+
+
+def validated_pdf_size(path: Path) -> int:
+    """Validate the staged artifact rather than accepting a stale final PDF."""
+    if not path.is_file():
+        raise PdfOutputValidationError(f"PDF output missing: {path}")
+    try:
+        size = path.stat().st_size
+        with path.open("rb") as stream:
+            page_count = len(PdfReader(stream).pages)
+    except (OSError, PdfReadError) as error:
+        raise PdfOutputValidationError(f"Cannot validate PDF output {path}: {error}") from error
+    if page_count < 1:
+        raise PdfOutputValidationError(f"PDF output has no pages: {path}")
+    return size
+
+
 def build_converter_command(
     converter: Path,
     source: Path,
@@ -205,56 +249,90 @@ def main() -> int:
         return 2
 
     output = resolve_output_path(source, args.mode, args.output)
+    if output == source:
+        print("PDF output must not replace the source Markdown.", file=sys.stderr)
+        return 2
+    if output.suffix.lower() != ".pdf":
+        print(f"PDF output must use a .pdf extension: {output}", file=sys.stderr)
+        return 2
+    if not output.parent.is_dir():
+        print(f"PDF output directory not found: {output.parent}", file=sys.stderr)
+        return 2
     try:
         converter = resolve_converter(args.converter)
     except (FileNotFoundError, ConverterConfigurationError) as error:
         print(error, file=sys.stderr)
         return 2
+    if output == converter:
+        print("PDF output must not replace the converter.", file=sys.stderr)
+        return 2
 
     source_hash_before = sha256_file(source)
-    css = profile_css(args.mode)
-    with tempfile.NamedTemporaryFile(
-        mode="w",
-        encoding="utf-8",
-        suffix=".css",
-        prefix=f"typora_profile_{args.mode}_",
-        delete=False,
-    ) as stream:
-        temporary_css = Path(stream.name)
-        stream.write(css)
-
+    staged_output: Path | None = None
     try:
-        command = build_converter_command(
-            converter,
-            source,
-            output,
-            temporary_css,
-            args.document_style_policy,
-            args.expected_pages,
-        )
         try:
-            completed = subprocess.run(command, check=False)
+            staged_output = reserve_staged_output_path(output)
         except OSError as error:
-            print(f"Failed to start Markdown PDF converter: {error}", file=sys.stderr)
+            print(f"Cannot reserve staged PDF output beside {output}: {error}", file=sys.stderr)
             return 2
+
+        css = profile_css(args.mode)
+        with tempfile.NamedTemporaryFile(
+            mode="w",
+            encoding="utf-8",
+            suffix=".css",
+            prefix=f"typora_profile_{args.mode}_",
+            delete=False,
+        ) as stream:
+            temporary_css = Path(stream.name)
+            stream.write(css)
+
+        try:
+            command = build_converter_command(
+                converter,
+                source,
+                staged_output,
+                temporary_css,
+                args.document_style_policy,
+                args.expected_pages,
+            )
+            try:
+                completed = subprocess.run(command, check=False)
+            except OSError as error:
+                print(f"Failed to start Markdown PDF converter: {error}", file=sys.stderr)
+                return 2
+        finally:
+            remove_temporary_best_effort(temporary_css)
+
+        try:
+            source_hash_after = sha256_file(source)
+        except OSError as error:
+            print(f"Cannot verify source Markdown after export: {error}", file=sys.stderr)
+            return 1
+        if source_hash_after != source_hash_before:
+            print("Source Markdown changed during export; refusing success.", file=sys.stderr)
+            return 1
+        if completed.returncode != 0:
+            return completed.returncode
+
+        try:
+            output_size = validated_pdf_size(staged_output)
+        except PdfOutputValidationError as error:
+            print(error, file=sys.stderr)
+            return 1
+        try:
+            os.replace(staged_output, output)
+        except OSError as error:
+            print(f"Cannot atomically replace PDF output {output}: {error}", file=sys.stderr)
+            return 1
+
+        print(
+            f"Export profile={args.mode} source_sha256={source_hash_before} "
+            f"output={output} bytes={output_size}"
+        )
+        return 0
     finally:
-        temporary_css.unlink(missing_ok=True)
-
-    if completed.returncode != 0:
-        return completed.returncode
-    source_hash_after = sha256_file(source)
-    if source_hash_after != source_hash_before:
-        print("Source Markdown changed during export; refusing success.", file=sys.stderr)
-        return 1
-    if not output.is_file() or output.stat().st_size <= 1024:
-        print(f"PDF output missing or too small: {output}", file=sys.stderr)
-        return 1
-
-    print(
-        f"Export profile={args.mode} source_sha256={source_hash_before} "
-        f"output={output} bytes={output.stat().st_size}"
-    )
-    return 0
+        remove_temporary_best_effort(staged_output)
 
 
 if __name__ == "__main__":

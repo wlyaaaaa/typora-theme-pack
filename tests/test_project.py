@@ -1,4 +1,5 @@
 import importlib.util
+import io
 import json
 import os
 import re
@@ -7,6 +8,8 @@ import tempfile
 import unittest
 from pathlib import Path
 from unittest.mock import patch
+
+from pypdf import PdfReader, PdfWriter
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -22,12 +25,26 @@ def load_module(name: str, path: Path):
     return module
 
 
+def write_single_page_pdf(path: Path, width: int = 72, height: int = 72) -> bytes:
+    writer = PdfWriter()
+    writer.add_blank_page(width=width, height=height)
+    with path.open("wb") as stream:
+        writer.write(stream)
+    return path.read_bytes()
+
+
 class ThemeProjectTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.previews = load_module("render_previews", TOOLS / "render_previews.py")
         cls.exporter = load_module("export_pdf", TOOLS / "export_pdf.py")
         cls.installer = load_module("install_theme", TOOLS / "install_theme.py")
+
+    def assert_no_staged_outputs(self, root: Path):
+        self.assertEqual(
+            list(root.glob(f"{self.exporter.STAGED_OUTPUT_PREFIX}*{self.exporter.STAGED_OUTPUT_SUFFIX}")),
+            [],
+        )
 
     def test_package_exposes_exactly_one_typora_app_theme(self):
         root_themes = sorted(path.name for path in (ROOT / "themes").glob("*.css"))
@@ -126,6 +143,219 @@ class ThemeProjectTest(unittest.TestCase):
             self.exporter.resolve_output_path(source, "company", "   "),
             Path("项目说明-公司.pdf"),
         )
+
+    def test_noop_converter_cannot_reuse_stale_pdf(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            source = root / "source.md"
+            source.write_text("# Current source\n", encoding="utf-8")
+            output = root / "output.pdf"
+            old_pdf = write_single_page_pdf(output)
+            converter = root / "noop_converter.py"
+            converter.write_text("raise SystemExit(0)\n", encoding="utf-8")
+
+            argv = [
+                "export_pdf.py",
+                "--input",
+                str(source),
+                "--mode",
+                "original",
+                "--output",
+                str(output),
+                "--converter",
+                str(converter),
+            ]
+            with patch.object(sys, "argv", argv), patch("builtins.print"):
+                result = self.exporter.main()
+
+            self.assertEqual(result, 1)
+            self.assertEqual(output.read_bytes(), old_pdf)
+            self.assert_no_staged_outputs(root)
+
+    def test_failed_converter_preserves_existing_pdf_and_removes_stage(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            source = root / "source.md"
+            source.write_text("# Current source\n", encoding="utf-8")
+            output = root / "output.pdf"
+            old_pdf = write_single_page_pdf(output)
+            converter = root / "failed_converter.py"
+            converter.write_text(
+                "from pathlib import Path\n"
+                "import sys\n"
+                "output = Path(sys.argv[sys.argv.index('--output') + 1])\n"
+                "output.write_bytes(b'%PDF-1.7\\n' + b'failed' * 400 + b'\\n%%EOF\\n')\n"
+                "raise SystemExit(7)\n",
+                encoding="utf-8",
+            )
+
+            argv = [
+                "export_pdf.py",
+                "--input",
+                str(source),
+                "--mode",
+                "original",
+                "--output",
+                str(output),
+                "--converter",
+                str(converter),
+            ]
+            with patch.object(sys, "argv", argv), patch("builtins.print"):
+                result = self.exporter.main()
+
+            self.assertEqual(result, 7)
+            self.assertEqual(output.read_bytes(), old_pdf)
+            self.assert_no_staged_outputs(root)
+
+    def test_pdf_shaped_junk_cannot_replace_existing_pdf(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            source = root / "source.md"
+            source.write_text("# Current source\n", encoding="utf-8")
+            output = root / "output.pdf"
+            old_pdf = write_single_page_pdf(output)
+            converter = root / "junk_converter.py"
+            converter.write_text(
+                "from pathlib import Path\nimport sys\n"
+                "output = Path(sys.argv[sys.argv.index('--output') + 1])\n"
+                "output.write_bytes(b'%PDF-1.7\\n' + b'junk' * 400 + b'\\n%%EOF\\n')\n",
+                encoding="utf-8",
+            )
+            argv = ["export_pdf.py", "--input", str(source), "--mode", "original", "--output", str(output), "--converter", str(converter)]
+            with patch.object(sys, "argv", argv), patch("builtins.print"):
+                result = self.exporter.main()
+            self.assertEqual(result, 1)
+            self.assertEqual(output.read_bytes(), old_pdf)
+            self.assert_no_staged_outputs(root)
+
+    def test_zero_page_pdf_cannot_replace_existing_pdf(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            source = root / "source.md"
+            source.write_text("# Current source\n", encoding="utf-8")
+            output = root / "output.pdf"
+            old_pdf = write_single_page_pdf(output)
+            converter = root / "zero_page_converter.py"
+            converter.write_text(
+                "from pathlib import Path\nimport sys\nfrom pypdf import PdfWriter\n"
+                "output = Path(sys.argv[sys.argv.index('--output') + 1])\n"
+                "writer = PdfWriter()\nwith output.open('wb') as stream: writer.write(stream)\n",
+                encoding="utf-8",
+            )
+            argv = ["export_pdf.py", "--input", str(source), "--mode", "original", "--output", str(output), "--converter", str(converter)]
+            with patch.object(sys, "argv", argv), patch("builtins.print"):
+                result = self.exporter.main()
+            self.assertEqual(result, 1)
+            self.assertEqual(output.read_bytes(), old_pdf)
+            self.assert_no_staged_outputs(root)
+
+    def test_successful_converter_atomically_replaces_pdf_without_residue(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            source = root / "source.md"
+            source.write_text("# Current source\n", encoding="utf-8")
+            output = root / "output.pdf"
+            old_pdf = write_single_page_pdf(output)
+            converter = root / "successful_converter.py"
+            converter.write_text(
+                "from pathlib import Path\n"
+                "import sys\n"
+                "from pypdf import PdfWriter\n"
+                "output = Path(sys.argv[sys.argv.index('--output') + 1])\n"
+                "writer = PdfWriter()\n"
+                "writer.add_blank_page(width=144, height=144)\n"
+                "with output.open('wb') as stream: writer.write(stream)\n",
+                encoding="utf-8",
+            )
+
+            argv = [
+                "export_pdf.py",
+                "--input",
+                str(source),
+                "--mode",
+                "original",
+                "--output",
+                str(output),
+                "--converter",
+                str(converter),
+            ]
+            with patch.object(sys, "argv", argv), patch("builtins.print"):
+                result = self.exporter.main()
+
+            self.assertEqual(result, 0)
+            self.assertNotEqual(output.read_bytes(), old_pdf)
+            reader = PdfReader(output)
+            self.assertEqual(len(reader.pages), 1)
+            self.assertEqual(float(reader.pages[0].mediabox.width), 144.0)
+            self.assertEqual(source.read_text(encoding="utf-8"), "# Current source\n")
+            self.assert_no_staged_outputs(root)
+
+    def test_staged_output_uses_short_name_for_long_output_basename(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            output = root / (("x" * 240) + ".pdf")
+            staged = self.exporter.reserve_staged_output_path(output)
+            self.assertEqual(staged.parent, root)
+            self.assertTrue(staged.name.startswith(self.exporter.STAGED_OUTPUT_PREFIX))
+            self.assertTrue(staged.name.endswith(self.exporter.STAGED_OUTPUT_SUFFIX))
+            self.assertLess(len(staged.name), 255)
+            self.assertFalse(staged.exists())
+            self.assert_no_staged_outputs(root)
+
+    def test_cleanup_failure_does_not_mask_converter_returncode(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            source = root / "source.md"
+            source.write_text("# Current source\n", encoding="utf-8")
+            output = root / "output.pdf"
+            old_pdf = write_single_page_pdf(output)
+            converter = root / "failed_converter.py"
+            converter.write_text(
+                "from pathlib import Path\nimport sys\n"
+                "output = Path(sys.argv[sys.argv.index('--output') + 1])\n"
+                "output.write_bytes(b'partial output')\nraise SystemExit(7)\n",
+                encoding="utf-8",
+            )
+            argv = ["export_pdf.py", "--input", str(source), "--mode", "original", "--output", str(output), "--converter", str(converter)]
+            original_unlink = Path.unlink
+            def unlink_with_stage_failure(path, missing_ok=False):
+                if path.name.startswith(self.exporter.STAGED_OUTPUT_PREFIX) and path.name.endswith(self.exporter.STAGED_OUTPUT_SUFFIX):
+                    raise OSError("simulated staged cleanup failure")
+                return original_unlink(path, missing_ok=missing_ok)
+            with patch.object(Path, "unlink", new=unlink_with_stage_failure), patch.object(sys, "argv", argv), patch("sys.stderr", new_callable=io.StringIO) as stderr:
+                result = self.exporter.main()
+            self.assertEqual(result, 7)
+            self.assertEqual(output.read_bytes(), old_pdf)
+            self.assertIn("Warning: cannot remove temporary file", stderr.getvalue())
+
+    def test_exporter_rejects_non_pdf_output_before_converter_runs(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            source = root / "source.md"
+            source.write_text("# Current source\n", encoding="utf-8")
+            output = root / "output.txt"
+            converter = root / "converter.py"
+            converter.write_text("raise SystemExit(0)\n", encoding="utf-8")
+            argv = ["export_pdf.py", "--input", str(source), "--mode", "original", "--output", str(output), "--converter", str(converter)]
+            with patch.object(sys, "argv", argv), patch.object(self.exporter.subprocess, "run") as run, patch("builtins.print"):
+                result = self.exporter.main()
+            self.assertEqual(result, 2)
+            run.assert_not_called()
+
+    def test_exporter_rejects_output_that_replaces_converter(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            source = root / "source.md"
+            source.write_text("# Current source\n", encoding="utf-8")
+            converter = root / "converter.pdf"
+            converter.write_text("raise SystemExit(0)\n", encoding="utf-8")
+            original_converter = converter.read_bytes()
+            argv = ["export_pdf.py", "--input", str(source), "--mode", "original", "--output", str(converter), "--converter", str(converter)]
+            with patch.object(sys, "argv", argv), patch.object(self.exporter.subprocess, "run") as run, patch("builtins.print"):
+                result = self.exporter.main()
+            self.assertEqual(result, 2)
+            self.assertEqual(converter.read_bytes(), original_converter)
+            run.assert_not_called()
 
     def test_public_docs_do_not_contain_machine_specific_paths(self):
         readme = (ROOT / "README.md").read_text(encoding="utf-8")
