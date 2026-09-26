@@ -1,9 +1,9 @@
 # Typora 薄荷主题与 PDF 样式
 
-- **这是什么：**给 Typora 添加一套薄荷色编辑主题，并提供原版、个人、公司三种 PDF 样式。
-- **我怎么用：**运行 `python tools/install_theme.py install`，重启 Typora 后在主题菜单选“Verdant Mint”。
-- **怎么知道正常：**运行 `python tools/install_theme.py verify`；结果显示 `verified: true` 即安装文件一致。
-- **坏了怎么提醒我：**没有自动提醒，出问题直接跟 AI 说。
-- **让 AI 做什么：**让 AI 检查主题、配置 PDF 转换器，再按需要导出原版、个人版或公司版。
+- **这是什么：** 给 Typora 加一套薄荷色的编辑主题，并提供原版、个人、公司三种 PDF 样式。
+- **我怎么用：** 让 AI 安装主题，重启 Typora 后在“主题”菜单选“Verdant Mint”。
+- **怎么知道正常：** Typora 的主题菜单里有“Verdant Mint”，选上后显示正常。
+- **坏了怎么提醒我：** 没有自动提醒，出问题直接跟 AI 说。
+- **让 AI 做什么：** 安装和检查主题、配置 PDF 转换器，按需要导出原版、个人版或公司版 PDF。
 
-PDF 导出需要另行配置兼容的转换器；安装主题本身不需要它。详见 [许可说明](NOTICE.md)。
+导出 PDF 要另外配置转换器，只装主题不需要。许可见 [NOTICE](NOTICE.md)。
