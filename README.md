@@ -7,3 +7,5 @@
 - **让 AI 做什么：** 安装和检查主题、配置 PDF 转换器，按需要导出原版、个人版或公司版 PDF。
 
 导出 PDF 要另外配置转换器，只装主题不需要。许可见 [NOTICE](NOTICE.md)。
+
+三种 PDF 导出在仓库的 `tools/export_pdf.py`，用 `--mode original`、`personal`、`company` 分别得到“原版”“个人”“公司”后缀。要刷新 Typora 的三个自定义导出菜单，在配置转换器后运行 `python tools/configure_typora_menu.py`；它只更新这三个菜单槽，先备份 `profile.data`。菜单通过 `typora_export_launcher.ps1` 每次读取 PCConfig 登记的 Python，仓库移动后重新运行菜单配置即可。

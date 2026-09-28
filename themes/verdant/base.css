@@ -285,6 +285,7 @@ content {
 }
 
 #write table th {
+  background: var(--table-head);
   color: var(--brand-deep);
   font-weight: 720;
   text-align: left;

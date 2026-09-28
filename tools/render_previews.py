@@ -32,20 +32,20 @@ EDGE_CANDIDATES = (
 
 THEME_META = {
     "original": {
-        "cn": "原样",
+        "cn": "原版",
         "app_cn": "薄荷",
         "en": "MARKDOWN STANDARD",
         "tag": "中性、朴素、忠实原文",
         "swatch": "#57606a",
     },
     "company": {
-        "cn": "公司内部",
+        "cn": "公司",
         "en": "TEAM DOCUMENT",
         "tag": "公司内部、专业审阅",
         "swatch": "#243b53",
     },
     "personal": {
-        "cn": "自己阅读",
+        "cn": "个人",
         "en": "PERSONAL READING",
         "tag": "更大字号、舒展长读",
         "swatch": "#078d50",
@@ -374,7 +374,7 @@ def contact_sheet(kind: str, source_dir: Path, output: Path, thumb_size: tuple[i
     sheet = Image.new("RGB", (width, height), "#eef3f0")
     draw = ImageDraw.Draw(sheet)
     draw.text((52, 32), "软件概念预览" if kind == "software" else "Markdown / PDF 页面预览", fill="#163d31", font=font(38, True))
-    draw.text((52, 78), "三种语义 · 忠实原样 / 公司内部 / 个人阅读", fill="#668078", font=font(19))
+    draw.text((52, 78), "三种语义 · 原版 / 个人 / 公司", fill="#668078", font=font(19))
 
     for index, (slug, meta) in enumerate(THEME_META.items()):
         row, col = divmod(index, 3)

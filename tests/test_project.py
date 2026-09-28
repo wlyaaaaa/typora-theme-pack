@@ -39,6 +39,33 @@ class ThemeProjectTest(unittest.TestCase):
         cls.previews = load_module("render_previews", TOOLS / "render_previews.py")
         cls.exporter = load_module("export_pdf", TOOLS / "export_pdf.py")
         cls.installer = load_module("install_theme", TOOLS / "install_theme.py")
+        cls.menu = load_module("configure_typora_menu", TOOLS / "configure_typora_menu.py")
+
+    def test_menu_refresh_uses_registered_python_launcher_and_keeps_other_settings(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            profile_path = Path(temporary) / "profile.data"
+            profile = {
+                "theme": "other-theme.css",
+                "customExport": [
+                    {"key": key, "name": "old", "type": "custom"}
+                    for key in ("custom", "custom1", "custom2")
+                ],
+                **{f"export.{key}": {"command": "old", "showOutput": False}
+                   for key in ("custom", "custom1", "custom2")},
+            }
+            profile_path.write_text(json.dumps(profile).encode("utf-8").hex(), encoding="ascii")
+            self.assertTrue(self.menu.configure(profile_path))
+            updated = json.loads(bytes.fromhex(profile_path.read_text(encoding="ascii")).decode("utf-8"))
+            self.assertEqual(updated["theme"], "other-theme.css")
+            self.assertEqual([item["name"] for item in updated["customExport"]], ["原版", "公司", "个人"])
+            for key, (_, mode) in self.menu.ENTRIES.items():
+                command = updated[f"export.{key}"]["command"]
+                self.assertIn("typora_export_launcher.ps1", command)
+                self.assertIn(f"-Mode {mode}", command)
+                self.assertNotIn("outputPath", command)
+                self.assertFalse(updated[f"export.{key}"]["showOutput"])
+            self.assertEqual(len(list(profile_path.parent.glob("profile.data.*.bak"))), 1)
+            self.assertFalse(self.menu.configure(profile_path))
 
     def assert_no_staged_outputs(self, root: Path):
         self.assertEqual(
