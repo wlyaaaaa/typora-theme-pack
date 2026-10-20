@@ -3,6 +3,7 @@ import io
 import json
 import os
 import re
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -36,7 +37,6 @@ def write_single_page_pdf(path: Path, width: int = 72, height: int = 72) -> byte
 class ThemeProjectTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.previews = load_module("render_previews", TOOLS / "render_previews.py")
         cls.exporter = load_module("export_pdf", TOOLS / "export_pdf.py")
         cls.installer = load_module("install_theme", TOOLS / "install_theme.py")
         cls.menu = load_module("configure_typora_menu", TOOLS / "configure_typora_menu.py")
@@ -80,9 +80,9 @@ class ThemeProjectTest(unittest.TestCase):
         self.assertTrue((ROOT / "themes" / "verdant" / "base.css").is_file())
 
     def test_export_profile_meanings_are_separate(self):
-        original = self.previews.profile_css("original")
-        company = self.previews.profile_css("company")
-        personal = self.previews.profile_css("personal")
+        original = self.exporter.profile_css("original")
+        company = self.exporter.profile_css("company")
+        personal = self.exporter.profile_css("personal")
 
         self.assertIn("--ink: #24292f", original)
         self.assertNotIn("#07854b", original)
@@ -96,6 +96,24 @@ class ThemeProjectTest(unittest.TestCase):
             self.assertNotIn(forbidden.casefold(), company.casefold())
         self.assertIn("#07854b", personal)
         self.assertIn("#078d50", personal)
+
+    def test_exporter_profiles_work_without_preview_dependencies(self):
+        script = (
+            "import importlib.abc, sys\n"
+            "sys.path.insert(0, sys.argv[1])\n"
+            "class BlockPreviewDependencies(importlib.abc.MetaPathFinder):\n"
+            "    def find_spec(self, fullname, path=None, target=None):\n"
+            "        if fullname.split('.', 1)[0] in {'PIL', 'markdown', 'render_previews'}:\n"
+            "            raise ModuleNotFoundError(fullname)\n"
+            "sys.meta_path.insert(0, BlockPreviewDependencies())\n"
+            "import export_pdf\n"
+            "for mode in export_pdf.MODES:\n"
+            "    assert export_pdf.profile_css(mode).strip(), mode\n"
+        )
+        result = subprocess.run(
+            [sys.executable, "-I", "-c", script, str(TOOLS)], capture_output=True, text=True
+        )
+        self.assertEqual(result.returncode, 0, result.stderr)
 
     def test_exporter_passes_profile_css_without_rewriting_markdown(self):
         command = self.exporter.build_converter_command(

@@ -19,7 +19,7 @@ import tempfile
 from pypdf import PdfReader
 from pypdf.errors import PdfReadError
 
-from render_previews import profile_css
+from profile_css import profile_css
 
 
 ROOT = Path(__file__).resolve().parents[1]

@@ -5,7 +5,6 @@ from __future__ import annotations
 
 import html
 import os
-import re
 import shutil
 import subprocess
 import tempfile
@@ -14,10 +13,10 @@ from pathlib import Path
 import markdown
 from PIL import Image, ImageDraw, ImageFont
 
+from profile_css import mint_theme_css, profile_css
+
 
 ROOT = Path(__file__).resolve().parents[1]
-THEMES = ROOT / "themes"
-EXPORT_PROFILES = ROOT / "export-profiles"
 SAMPLE = ROOT / "samples" / "00-主题预览.md"
 HTML_DIR = ROOT / "qa" / "html"
 STYLED_MD_DIR = ROOT / "qa" / "styled-md"
@@ -107,20 +106,6 @@ def playwright_runtime() -> tuple[Path, Path] | None:
     if nodes and modules and PLAYWRIGHT_HELPER.is_file():
         return nodes[0], modules[0]
     return None
-
-
-def mint_theme_css() -> str:
-    base = (THEMES / "verdant" / "base.css").read_text(encoding="utf-8")
-    mint = (THEMES / "verdant-mint.css").read_text(encoding="utf-8")
-    mint = re.sub(r"^\s*@import[^;]+;\s*", "", mint, count=1)
-    return base + "\n\n" + mint
-
-
-def profile_css(slug: str) -> str:
-    profile = (EXPORT_PROFILES / f"{slug}.css").read_text(encoding="utf-8")
-    if slug == "personal":
-        return mint_theme_css() + "\n\n" + profile
-    return profile
 
 
 def markdown_html() -> str:
