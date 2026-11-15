@@ -11,3 +11,5 @@
 Pillow 只用于生成预览图，导出工具不依赖它。预览工具仍保留；外部 PDF 转换器需要哪些依赖（例如 Markdown），以转换器自身的要求为准。
 
 三种 PDF 导出在仓库的 `tools/export_pdf.py`，用 `--mode original`、`personal`、`company` 分别得到“原版”“个人”“公司”后缀。要刷新 Typora 的三个自定义导出菜单，在配置转换器后运行 `python tools/configure_typora_menu.py`；它只更新这三个菜单槽，先备份 `profile.data`。菜单通过 `typora_export_launcher.ps1` 每次读取 PCConfig 登记的 Python，仓库移动后重新运行菜单配置即可。
+
+实况接入在 `docs/live.contract.json`；沿原验证入口按需刷新：`python tools/install_theme.py verify --live-output docs/live.snapshot.json --profile-data <本机配置文件> --host-python-registry <本机Python登记>`，隔离工作树检查正式安装时再传 `--installation-root <正式检出>`。它只检查现有配置和文件，不试导出。机器路径由本机调用方提供；换主题、菜单或样张后重新取，页面只显示这次检查的时刻，不会自己重跑验证，也没有新增定时任务。

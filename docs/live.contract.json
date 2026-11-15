@@ -1,0 +1,116 @@
+{
+  "v": 1,
+  "id": "typora-theme-pack",
+  "name": "薄荷稿纸",
+  "about": "给 Typora 换上薄荷色外观，菜单一点导出三种版式 PDF。",
+  "headline": "menus",
+  "tasks": [],
+  "skills": [],
+  "bindings_complete": true,
+  "sections": [
+    {
+      "id": "theme",
+      "label": "主题",
+      "metrics": [
+        "theme",
+        "theme_files"
+      ]
+    },
+    {
+      "id": "pdf",
+      "label": "PDF 导出",
+      "metrics": [
+        "menus"
+      ],
+      "note": "接好了，没试导出；只检查配置和目标文件。"
+    },
+    {
+      "id": "more",
+      "label": "更多数据",
+      "metrics": [
+        "pdfs",
+        "previews",
+        "samples_changed"
+      ]
+    }
+  ],
+  "metrics": [
+    {
+      "id": "theme",
+      "label": "现在用的主题",
+      "source": "typora.live",
+      "pointer": "/metrics/theme",
+      "time": "/at",
+      "mode": "live",
+      "unit": "",
+      "stale_after": 60,
+      "public": "same"
+    },
+    {
+      "id": "theme_files",
+      "label": "主题和本仓版本一样吗",
+      "source": "typora.live",
+      "pointer": "/metrics/theme_files",
+      "time": "/at",
+      "mode": "live",
+      "unit": "",
+      "stale_after": 60,
+      "public": "same"
+    },
+    {
+      "id": "menus",
+      "label": "导出菜单接好的",
+      "source": "typora.live",
+      "pointer": "/metrics/menus",
+      "time": "/at",
+      "mode": "live",
+      "unit": "",
+      "stale_after": 60,
+      "public": "same",
+      "records": "/metrics/menu_list",
+      "shape": "list"
+    },
+    {
+      "id": "pdfs",
+      "label": "公开 PDF 样张",
+      "source": "typora.live",
+      "pointer": "/metrics/pdfs",
+      "time": "/at",
+      "mode": "live",
+      "unit": "份",
+      "stale_after": 60,
+      "public": "same"
+    },
+    {
+      "id": "previews",
+      "label": "公开预览图",
+      "source": "typora.live",
+      "pointer": "/metrics/previews",
+      "time": "/at",
+      "mode": "live",
+      "unit": "幅",
+      "stale_after": 60,
+      "public": "same"
+    },
+    {
+      "id": "samples_changed",
+      "label": "现存 PDF 样张最后一次改动",
+      "source": "typora.live",
+      "pointer": "/metrics/samples_changed",
+      "time": "/at",
+      "mode": "live",
+      "unit": "",
+      "stale_after": 60,
+      "public": "same"
+    }
+  ],
+  "artifacts": {
+    "source": "typora.live",
+    "pointer": "/artifacts"
+  },
+  "size": {
+    "source": "typora.live",
+    "pointer": "/size"
+  },
+  "links": []
+}
