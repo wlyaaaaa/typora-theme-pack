@@ -14,7 +14,9 @@
       "metrics": [
         "theme",
         "theme_files"
-      ]
+      ],
+      "about": "现在用的是哪套主题，安装的文件对不对？",
+      "note": ""
     },
     {
       "id": "pdf",
@@ -22,16 +24,19 @@
       "metrics": [
         "menus"
       ],
-      "note": "接好了，没试导出；只检查配置和目标文件。"
+      "note": "接好了，没试导出；只检查配置和目标文件。",
+      "about": "三个 PDF 导出菜单的配置和文件接好了吗？"
     },
     {
-      "id": "more",
+      "id": "more-data",
       "label": "更多数据",
       "metrics": [
         "pdfs",
         "previews",
         "samples_changed"
-      ]
+      ],
+      "about": "有多少公开样张和预览，样张哪天改的？",
+      "note": ""
     }
   ],
   "metrics": [
@@ -112,5 +117,13 @@
     "source": "typora.live",
     "pointer": "/size"
   },
-  "links": []
+  "links": [
+    {
+      "id": "intro",
+      "label": "项目介绍",
+      "href": "https://github.com/wlyaaaaa/typora-theme-pack#readme"
+    }
+  ],
+  "cover": "https://raw.githubusercontent.com/wlyaaaaa/typora-theme-pack/main/previews/markdown-overview.png",
+  "skills_href": "/skills/?project=typora-theme-pack"
 }

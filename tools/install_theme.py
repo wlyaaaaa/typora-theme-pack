@@ -172,7 +172,7 @@ def live_snapshot(report, args):
     return dict(v=1, at=at, scope="Current installed theme and configured menus; export was not run",
         metrics=dict(theme="Verdant Mint" if profile.get("theme") == "verdant-mint.css" else profile.get("theme"),
             theme_files=f'{sum(p["matches"] for p in files)}/2（缺 {sum(not p["exists"] for p in files)}、被改 {sum(p["exists"] and not p["matches"] for p in files)}）',
-            menus=f"{len(connected)}/3", menu_list=connected,
+            menus=f"{len(connected)}/3", menu_list=[dict(label=label, text=label, state_text="已接好") for label in connected],
             pdfs=sum(p.suffix == ".pdf" for p in products), previews=sum(p.suffix == ".png" for p in products),
             samples_changed=git("log", "-1", "--format=%cI", "--", "exports/*.pdf").strip()),
         size=dict(at=at, docs_chars=sum(len((ROOT/p).read_text("utf-8-sig")) for p in tracked if p.suffix == ".md"),
