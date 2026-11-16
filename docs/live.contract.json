@@ -16,7 +16,7 @@
         "theme_files"
       ],
       "about": "现在用的是哪套主题，安装的文件对不对？",
-      "note": ""
+      "note": "安装或导出流程核对后更新，显示上次核对结果；页面不每分钟重新检查。"
     },
     {
       "id": "pdf",
@@ -36,41 +36,41 @@
         "samples_changed"
       ],
       "about": "有多少公开样张和预览，样张哪天改的？",
-      "note": ""
+      "note": "样张库存按需更新，保留取数时刻，不按实时数据标旧。"
     }
   ],
   "metrics": [
     {
       "id": "theme",
-      "label": "现在用的主题",
+      "label": "上次核对使用的主题",
       "source": "typora.live",
       "pointer": "/metrics/theme",
       "time": "/at",
       "mode": "live",
       "unit": "",
-      "stale_after": 60,
+      "stale_after": null,
       "public": "same"
     },
     {
       "id": "theme_files",
-      "label": "主题和本仓版本一样吗",
+      "label": "上次核对主题文件与本仓一致吗",
       "source": "typora.live",
       "pointer": "/metrics/theme_files",
       "time": "/at",
       "mode": "live",
       "unit": "",
-      "stale_after": 60,
+      "stale_after": null,
       "public": "same"
     },
     {
       "id": "menus",
-      "label": "导出菜单接好的",
+      "label": "上次核对接好的导出菜单",
       "source": "typora.live",
       "pointer": "/metrics/menus",
       "time": "/at",
       "mode": "live",
       "unit": "",
-      "stale_after": 60,
+      "stale_after": null,
       "public": "same",
       "records": "/metrics/menu_list",
       "shape": "list"
@@ -81,9 +81,9 @@
       "source": "typora.live",
       "pointer": "/metrics/pdfs",
       "time": "/at",
-      "mode": "live",
+      "mode": "static",
       "unit": "份",
-      "stale_after": 60,
+      "stale_after": null,
       "public": "same"
     },
     {
@@ -92,9 +92,9 @@
       "source": "typora.live",
       "pointer": "/metrics/previews",
       "time": "/at",
-      "mode": "live",
+      "mode": "static",
       "unit": "幅",
-      "stale_after": 60,
+      "stale_after": null,
       "public": "same"
     },
     {
@@ -103,9 +103,9 @@
       "source": "typora.live",
       "pointer": "/metrics/samples_changed",
       "time": "/at",
-      "mode": "live",
+      "mode": "static",
       "unit": "",
-      "stale_after": 60,
+      "stale_after": null,
       "public": "same"
     }
   ],
