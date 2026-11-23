@@ -151,6 +151,20 @@ def main() -> int:
     return 0 if report["verified"] else 1
 
 
+def git(*arguments):
+    return subprocess.check_output(["git", "-C", str(ROOT), *arguments], encoding="utf-8", creationflags=0x08000000 if os.name == "nt" else 0)
+
+
+def tracked_files():
+    return [Path(p) for p in git("ls-files", "-z").split("\0") if p and (ROOT / p).is_file()]
+
+
+def source_size(tracked=None):
+    tracked = tracked_files() if tracked is None else tracked
+    return dict(docs_chars=sum(len((ROOT/p).read_text("utf-8-sig")) for p in tracked if p.suffix == ".md"),
+        code_lines=sum(len((ROOT/p).read_text("utf-8-sig").splitlines()) for p in tracked if p.suffix in {".py", ".ps1", ".css", ".js", ".gs"}))
+
+
 def live_snapshot(report, args):
     """Existing verifier's on-demand result; never exports settings or private documents."""
     from configure_typora_menu import ENTRIES
@@ -163,9 +177,7 @@ def live_snapshot(report, args):
     menus = {row["key"]: row for row in profile["customExport"]}
     connected = [label for key, (label, mode) in ENTRIES.items() if ready and menus.get(key, {}).get("name") == label
         and profile.get(f"export.{key}", {}).get("command") == f'pwsh -NoProfile -ExecutionPolicy Bypass -File "{launcher}" -InputPath "${{currentPath}}" -Mode {mode}']
-    def git(*arguments):
-        return subprocess.check_output(["git", "-C", str(ROOT), *arguments], encoding="utf-8", creationflags=0x08000000 if os.name == "nt" else 0)
-    tracked = [Path(p) for p in git("ls-files", "-z").split("\0") if p and (ROOT / p).is_file()]
+    tracked = tracked_files()
     products = [p for p in tracked if p.parts[0] in {"exports", "previews"} and p.suffix in {".pdf", ".png"}]
     at = datetime.now(timezone.utc).isoformat()
     files = report["files"]
@@ -175,8 +187,7 @@ def live_snapshot(report, args):
             menus=f"{len(connected)}/3", menu_list=[dict(label=label, text=label, state_text="已接好") for label in connected],
             pdfs=sum(p.suffix == ".pdf" for p in products), previews=sum(p.suffix == ".png" for p in products),
             samples_changed=git("log", "-1", "--format=%cI", "--", "exports/*.pdf").strip()),
-        size=dict(at=at, docs_chars=sum(len((ROOT/p).read_text("utf-8-sig")) for p in tracked if p.suffix == ".md"),
-            code_lines=sum(len((ROOT/p).read_text("utf-8-sig").splitlines()) for p in tracked if p.suffix in {".py", ".ps1", ".css", ".js", ".gs"})),
+        size=dict(at=at, **source_size(tracked)),
         artifacts=[dict(at=git("log", "-1", "--format=%cI", "--", p.as_posix()).strip(), kind="pdf" if p.suffix == ".pdf" else "image",
             title=p.stem, status="completed", public="same", open=dict(source="typora.artifact."+hashlib.sha256(p.as_posix().encode()).hexdigest()[:12],
                 href="https://raw.githubusercontent.com/wlyaaaaa/typora-theme-pack/main/"+quote(p.as_posix()))) for p in products])
