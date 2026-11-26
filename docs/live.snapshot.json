@@ -1,6 +1,6 @@
 {
   "v": 1,
-  "at": "2026-11-16T00:05:37.259818+00:00",
+  "at": "2026-11-26T06:56:27.508560+00:00",
   "scope": "Current installed theme and configured menus; export was not run",
   "metrics": {
     "theme": "Verdant Mint",
@@ -28,9 +28,9 @@
     "samples_changed": "2026-09-28T12:36:45-05:00"
   },
   "size": {
-    "docs_chars": 4272,
-    "code_lines": 2779,
-    "at": "2026-11-23T20:34:03.138258+00:00"
+    "at": "2026-11-26T06:56:27.508560+00:00",
+    "docs_chars": 4297,
+    "code_lines": 2779
   },
   "artifacts": [
     {
