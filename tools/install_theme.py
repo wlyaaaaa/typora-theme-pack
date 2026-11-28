@@ -161,7 +161,7 @@ def tracked_files():
 
 def source_size(tracked=None):
     tracked = tracked_files() if tracked is None else tracked
-    return dict(docs_chars=sum(len((ROOT/p).read_text("utf-8-sig")) for p in tracked if p.suffix == ".md"),
+    return dict(docs_chars=sum(len("".join((ROOT/p).read_text("utf-8-sig").split())) for p in tracked if p.suffix == ".md"),
         code_lines=sum(len((ROOT/p).read_text("utf-8-sig").splitlines()) for p in tracked if p.suffix in {".py", ".ps1", ".css", ".js", ".gs"}))
 
 
